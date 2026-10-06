@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>James Wang | Senior AI Engineer</title>
+<meta name="description" content="Minghui (James) Wang: senior AI engineer and systems architect. 23 years shipping software, 11 AI platforms built and run in production.">
+<meta name="author" content="Minghui (James) Wang">
+<link rel="canonical" href="https://apideed.github.io/">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="James Wang | Senior AI Engineer">
+<meta property="og:description" content="Minghui (James) Wang: senior AI engineer and systems architect. 23 years shipping software, 11 AI platforms built and run in production.">
+<meta property="og:url" content="https://apideed.github.io/">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%231F5A86'/%3E%3Ctext x='16' y='21' font-family='Arial' font-size='13' font-weight='700' fill='white' text-anchor='middle'%3EJW%3C/text%3E%3C/svg%3E">
+<style>html,body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a recruiter's one-sheet. Sticky fact card on the left, scannable evidence on the right, career ruler as the signature element. */
+:root {
+  --bg: #F3F5F2; --surface: #FFFFFF; --ink: #16201E; --muted: #5B6866; --line: #DCE2DE;
+  --accent: #1F5A86; --accent-soft: #E3EDF5; --mark: #B9822A; --mark-soft: #F6ECDB;
+  --f-display: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
+  --f-quote: 'Instrument Serif', Georgia, serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #101615; --surface: #172020; --ink: #E7EDEB; --muted: #98A6A3; --line: #283432;
+  --accent: #82B6DD; --accent-soft: #1A2B38; --mark: #E2B062; --mark-soft: #2E2616; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #101615; --surface: #172020; --ink: #E7EDEB; --muted: #98A6A3; --line: #283432;
+  --accent: #82B6DD; --accent-soft: #1A2B38; --mark: #E2B062; --mark-soft: #2E2616; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 var(--f-display); margin: 0; }
+.wrap { max-width: 1160px; margin: 0 auto; padding-inline: 24px; padding-block: 48px 72px; display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 48px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.eyebrow { font: 500 12px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+/* Fact card */
+.card { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 22px; }
+.mono-badge { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); color: var(--surface); display: grid; place-items: center; font: 600 22px/1 var(--f-display); letter-spacing: .02em; }
+.card h1 { font-size: 30px; line-height: 1.1; letter-spacing: -.01em; }
+.card .role { color: var(--muted); margin-top: 6px; font-size: 15px; }
+dl { margin: 0; display: grid; gap: 14px; }
+dt { font: 500 11px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+dd { margin: 0; font-size: 15px; line-height: 1.45; }
+.copy { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.copy span { font: 400 14px/1.4 var(--f-mono); user-select: all; min-width: 0; overflow-wrap: anywhere; }
+button.c { font: 500 12px var(--f-display); border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 6px; padding: 4px 10px; cursor: pointer; flex: none; }
+button.c:hover { border-color: var(--accent); color: var(--accent); }
+.status { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; background: var(--mark-soft); color: var(--ink); border-radius: 999px; padding: 6px 12px; align-self: flex-start; }
+.status i { width: 8px; height: 8px; border-radius: 50%; background: var(--mark); display: block; }
+
+/* Main column */
+main { display: flex; flex-direction: column; gap: 56px; min-width: 0; }
+.lede h2 { font: 400 clamp(30px, 4vw, 44px)/1.15 var(--f-quote); letter-spacing: -.005em; max-width: 24ch; }
+.lede h2 em { font-style: italic; color: var(--accent); }
+.lede p { max-width: 62ch; color: var(--muted); font-size: 17px; margin: 18px 0 0; }
+.figs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 28px; }
+.figs div { padding: 18px 16px 18px 0; }
+.figs div + div { padding-left: 16px; border-left: 1px solid var(--line); }
+.figs b { display: block; font: 600 30px/1 var(--f-display); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.figs span { display: block; font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.35; }
+section > .eyebrow { display: block; margin-bottom: 14px; }
+section > h3 { font-size: 24px; letter-spacing: -.01em; margin-bottom: 18px; }
+
+/* Career ruler */
+.ruler { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 22px 16px; overflow-x: auto; }
+.ruler-inner { min-width: 640px; }
+.lane { position: relative; height: 40px; margin-bottom: 8px; }
+.seg { position: absolute; top: 0; height: 40px; border-radius: 6px; padding: 0 10px; display: flex; align-items: center; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; background: var(--accent-soft); color: var(--ink); border: 1px solid var(--line); }
+.seg.now { background: var(--accent); color: var(--surface); border-color: var(--accent); }
+.seg.side { background: var(--mark-soft); border-style: dashed; border-color: var(--mark); }
+.ticks { position: relative; height: 22px; border-top: 1px solid var(--line); margin-top: 6px; }
+.ticks span { position: absolute; top: 6px; transform: translateX(-50%); font: 400 11px var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+/* Keyword map */
+.map { width: 100%; border-collapse: collapse; font-size: 15px; }
+.map th { text-align: left; font: 500 11px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 0 12px 10px 0; border-bottom: 1px solid var(--ink); }
+.map td { padding: 14px 12px 14px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.map td:first-child { font-weight: 600; width: 34%; }
+.map td small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+.tbl { overflow-x: auto; }
+
+/* Work */
+.work { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.work a { text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: 10px; }
+.work img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; border-radius: 10px; border: 1px solid var(--line); display: block; }
+.work b { font-size: 15px; } .work span { font-size: 13px; color: var(--muted); line-height: 1.4; }
+.work a:hover b { color: var(--accent); }
+
+/* FAQ */
+details { border-bottom: 1px solid var(--line); padding: 16px 0; }
+details:first-of-type { border-top: 1px solid var(--line); }
+summary { cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+summary::after { content: '+'; color: var(--muted); font: 400 20px/1 var(--f-mono); }
+details[open] summary::after { content: '\2212'; }
+details p { margin: 10px 0 0; color: var(--muted); max-width: 64ch; }
+
+.note { border-left: 3px solid var(--mark); padding: 4px 0 4px 22px; }
+.note p { font: 400 22px/1.45 var(--f-quote); margin: 0; max-width: 46ch; }
+.note .sig { font: 400 13px var(--f-mono); color: var(--muted); margin-top: 12px; }
+
+@media (max-width: 900px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-block: 24px 48px; padding-inline: 16px; }
+  .card { position: static; }
+  .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .figs div:nth-child(3) { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); }
+  .figs div:nth-child(4) { border-top: 1px solid var(--line); }
+  .work { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) { .work { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="card" aria-label="Contact and key facts">
+    <div class="mono-badge" aria-hidden="true">JW</div>
+    <div>
+      <h1>Minghui (James) Wang</h1>
+      <div class="role">Senior AI Engineer &middot; AI Systems Architect</div>
+    </div>
+    <div class="status"><i></i>Open to senior AI engineering roles</div>
+    <dl>
+      <div><dt>Based in</dt><dd>Frederick, Maryland</dd></div>
+      <div><dt>Now</dt><dd>Senior Software Engineer, QIAGEN<br>CTO (part-time), AAWEA</dd></div>
+      <div><dt>Languages</dt><dd>English, Mandarin Chinese</dd></div>
+      <div><dt>Email</dt><dd class="copy"><span id="em">james.wang@apideed.com</span><button class="c" type="button" data-copy="em">Copy</button></dd></div>
+      <div><dt>For hiring managers</dt><dd><a href="casebook/">Engineering casebook &rarr;</a><br><span style="color:var(--muted);font-size:13px">Architecture, decisions and trade-offs</span></dd></div>
+      <div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/jameswangusa">linkedin.com/in/jameswangusa</a></dd></div>
+      <div><dt>GitHub</dt><dd><a href="https://github.com/apideed">github.com/apideed</a></dd></div>
+    </dl>
+  </aside>
+
+  <main>
+    <section class="lede">
+      <span class="eyebrow">For recruiters &middot; the short version</span>
+      <h2>Over twenty years of shipping software, and the last three putting <em>AI into real businesses</em>.</h2>
+      <p>I build AI products end to end, from the database to the screen a customer sees. In the past year I designed and built 11 AI platforms on my own for law firms, restaurants, schools and contractors. Before that I led a 15-person engineering team and ran high-traffic booking systems. I still write the code.</p>
+      <div class="figs" role="list">
+        <div role="listitem"><b>23</b><span>years building software, since 2003</span></div>
+        <div role="listitem"><b>11</b><span>AI platforms built solo as CTO of AAWEA</span></div>
+        <div role="listitem"><b>15</b><span>engineers hired and led at Amerilink</span></div>
+        <div role="listitem"><b>32</b><span>servers migrated across clouds, cost cut to one-third</span></div>
+      </div>
+    </section>
+
+    <section>
+      <span class="eyebrow">Career at a glance</span>
+      <h3>Where the years went</h3>
+      <div class="ruler" tabindex="0" aria-label="Career timeline from 1999 to 2026">
+        <div class="ruler-inner" id="ruler"></div>
+      </div>
+      <div class="legend"><span>Solid: full-time role</span><span>Dashed: part-time, alongside QIAGEN</span><span>Scrolls sideways on small screens</span></div>
+    </section>
+
+    <section>
+      <span class="eyebrow">Matching your job description</span>
+      <h3>If the posting asks for it, here is where I did it</h3>
+      <div class="tbl"><table class="map">
+        <thead><tr><th>Requirement</th><th>Evidence</th></tr></thead>
+        <tbody>
+          <tr><td>LLM / generative AI applications</td><td>LawyerPara, Alzaro, Tegaia, Alzaro Ads<small>OpenAI, Anthropic, Gemini; live products with subscription plans</small></td></tr>
+          <tr><td>AI agents and multi-agent workflows</td><td>Six case-level assistants in LawyerPara<small>Each agent has its own permission tier</small></td></tr>
+          <tr><td>RAG and grounded answers</td><td>Alzaro Knowledge Hub, Wokrise restaurant agent<small>Answers only from verified business facts</small></td></tr>
+          <tr><td>Voice AI, telephony</td><td>Wokrise AI front desk<small>Twilio, WhatsApp Cloud API; hands calls to staff on request</small></td></tr>
+          <tr><td>Responsible AI, privacy, compliance</td><td>Human approval, PII masking, audit logs; 21 CFR Part 11 at QIAGEN</td></tr>
+          <tr><td>API design and enterprise integration</td><td>SAP and GeneGlobe at QIAGEN; 12 supplier APIs at Amerilink</td></tr>
+          <tr><td>Cloud and scale</td><td>AWS, Azure, Google Cloud, Alibaba Cloud<small>Booking API behind a load balancer rated at 10K QPS</small></td></tr>
+          <tr><td>Testing and quality</td><td>1,487 automated tests on a live school system<small>PHPUnit, Postman, SoapUI</small></td></tr>
+          <tr><td>Team leadership</td><td>Built the U.S. team from zero to 15 at Amerilink</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <span class="eyebrow">Selected work &middot; live sites</span>
+      <h3>Things you can open right now</h3>
+      <div class="work">
+        <a href="https://lawyerpara.com/marketing/"><img src="lp_cover.jpg" alt="LawyerPara product overview" loading="lazy"><b>LawyerPara</b><span>AI assistants for law firms, with partner approval on every client message</span></a>
+        <a href="https://www.alzaro.ai/marketing"><img src="az_cover.jpg" alt="Alzaro product overview" loading="lazy"><b>Alzaro</b><span>AI growth platform for local businesses</span></a>
+        <a href="https://u.alzaro.ai/owner-help/sales-deck.html"><img src="wk_cover.jpg" alt="Wokrise product overview" loading="lazy"><b>Wokrise</b><span>Voice AI that answers a restaurant&rsquo;s phone</span></a>
+        <a href="https://tegaia.com/marketing/indexv2.html"><img src="tg_cover.jpg" alt="Tegaia product overview" loading="lazy"><b>Tegaia</b><span>AI tutor that gives hints, not answers</span></a>
+        <a href="https://cary.aawea.org/marketing/"><img src="cy_site.jpg" alt="Cary Learning Academy website" loading="lazy"><b>Cary Learning Academy</b><span>School system in daily use, 1,487 automated tests</span></a>
+        <a href="https://fieldsbrain.com/marketing"><img src="fb_cover.jpg" alt="FieldsBrain product overview" loading="lazy"><b>FieldsBrain</b><span>Field-service software for contractors</span></a>
+      </div>
+    </section>
+
+    <section>
+      <span class="eyebrow">Questions recruiters usually ask</span>
+      <h3>Quick answers</h3>
+      <details><summary>Is he working now?</summary><p>Yes. Full time as a Senior Software Engineer at QIAGEN since 2021, and part time as CTO of AAWEA, a nonprofit for entrepreneurs, since 2025.</p></details>
+      <details><summary>Individual contributor or manager?</summary><p>Both, by choice. I led a team of 15 at Amerilink, and today I design and code entire products myself. I am most useful as a senior or lead engineer who still ships.</p></details>
+      <details><summary>How much real AI experience?</summary><p>Three-plus years of building with OpenAI, Anthropic and Gemini APIs, including products with subscription plans and a voice agent answering real customer calls.</p></details>
+      <details><summary>What is the fastest way to reach him?</summary><p>Email james.wang@apideed.com or message me on LinkedIn.</p></details>
+    </section>
+
+    <section class="note">
+      <p>I started as a web developer in Harbin, building websites for American companies from the other side of the world. Now I build AI for the restaurant and the law office down the road. The job is the same: make something a busy person can trust on an ordinary Tuesday.</p>
+      <div class="sig">James Wang</div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var start = 1999, end = 2026.8, span = end - start;
+  var lanes = [
+    [ { a: 1999, b: 2002, t: 'HUST' }, { a: 2003, b: 2012.9, t: 'Harbin Melongda: developer, then tech lead' }, { a: 2013, b: 2020.9, t: 'Amerilink: tech lead' }, { a: 2021, b: end, t: 'QIAGEN', cls: 'now' } ],
+    [ { a: 2025, b: end, t: 'AAWEA', cls: 'side' } ]
+  ];
+  var root = document.getElementById('ruler');
+  lanes.forEach(function (lane) {
+    var l = document.createElement('div'); l.className = 'lane';
+    lane.forEach(function (s) {
+      var d = document.createElement('div'); d.className = 'seg' + (s.cls ? ' ' + s.cls : '');
+      d.style.left = ((s.a - start) / span * 100) + '%';
+      d.style.width = ((s.b - s.a) / span * 100) + '%';
+      d.textContent = s.t; d.title = s.t; l.appendChild(d);
+    });
+    root.appendChild(l);
+  });
+  var t = document.createElement('div'); t.className = 'ticks';
+  [1999, 2003, 2008, 2013, 2017, 2021, 2025].forEach(function (y) {
+    var s = document.createElement('span'); s.textContent = y; s.style.left = ((y - start) / span * 100) + '%'; t.appendChild(s);
+  });
+  root.appendChild(t);
+
+  document.querySelectorAll('button[data-copy]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var el = document.getElementById(b.dataset.copy), txt = el.textContent;
+      function done() { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1600); }
+      function fallback() { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected'; }
+      try { navigator.clipboard.writeText(txt).then(done, fallback); } catch (e) { fallback(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

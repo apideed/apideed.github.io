@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Casebook | James Wang</title>
+<meta name="description" content="Four systems by James Wang written up as design records: problem, constraint, decision, trade-off, with architecture diagrams.">
+<meta name="author" content="Minghui (James) Wang">
+<link rel="canonical" href="https://apideed.github.io/casebook/">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Casebook | James Wang">
+<meta property="og:description" content="Four systems by James Wang written up as design records: problem, constraint, decision, trade-off, with architecture diagrams.">
+<meta property="og:url" content="https://apideed.github.io/casebook/">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%231F5A86'/%3E%3Ctext x='16' y='21' font-family='Arial' font-size='13' font-weight='700' fill='white' text-anchor='middle'%3EJW%3C/text%3E%3C/svg%3E">
+<style>html,body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=Literata:opsz,wght@7..72,400;7..72,500&family=Martian+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an engineer's casebook. Case index on the left like notebook tabs; each case reads as a design record with a live system diagram. */
+:root {
+  --bg: #ECEFEC; --paper: #FAFBF8; --ink: #121614; --muted: #59625D; --line: #D3D9D4;
+  --pass: #2B6B47; --pass-soft: #DDEDE2; --limit: #A3481F; --limit-soft: #F5E3DA;
+  --f-head: 'Archivo', 'Arial Narrow', Arial, sans-serif;
+  --f-body: 'Literata', Georgia, serif;
+  --f-mono: 'Martian Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1311; --paper: #161B18; --ink: #E5EAE6; --muted: #98A39D; --line: #2A322D;
+  --pass: #79C496; --pass-soft: #1B2D22; --limit: #E58B62; --limit-soft: #33221A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0F1311; --paper: #161B18; --ink: #E5EAE6; --muted: #98A39D; --line: #2A322D;
+  --pass: #79C496; --pass-soft: #1B2D22; --limit: #E58B62; --limit-soft: #33221A; color-scheme: dark }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.65 var(--f-body); }
+a { color: var(--pass); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--pass); outline-offset: 2px; }
+.page { max-width: 1180px; margin: 0 auto; padding-inline: 24px; padding-block: 56px 80px; }
+.lbl { font: 500 11px/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1, h2, h3 { font-family: var(--f-head); text-wrap: balance; margin: 0; }
+
+header.top { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 40px; align-items: end; padding-bottom: 36px; border-bottom: 2px solid var(--ink); }
+header.top h1 { font-size: clamp(36px, 5.4vw, 66px); line-height: .98; font-weight: 800; font-stretch: 82%; letter-spacing: -.01em; margin-top: 14px; }
+header.top p { margin: 0; color: var(--muted); max-width: 46ch; }
+.log { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px 18px; font: 400 12px/1.6 var(--f-mono); color: var(--muted); }
+.log b { color: var(--pass); font-weight: 500; }
+
+.book { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 40px; margin-top: 40px; }
+nav.tabs { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: flex; flex-direction: column; gap: 6px; }
+nav.tabs button { all: unset; cursor: pointer; display: grid; grid-template-columns: 34px 1fr; gap: 4px 10px; padding: 12px 14px; border-radius: 10px; border: 1px solid transparent; }
+nav.tabs button .n { font: 500 12px/1.5 var(--f-mono); color: var(--muted); grid-row: span 2; }
+nav.tabs button .t { font: 700 17px/1.2 var(--f-head); font-stretch: 90%; }
+nav.tabs button .s { font: 400 13px/1.35 var(--f-body); color: var(--muted); }
+nav.tabs button[aria-selected="true"] { background: var(--paper); border-color: var(--line); }
+nav.tabs button[aria-selected="true"] .n { color: var(--pass); }
+nav.tabs button:hover .t { color: var(--pass); }
+
+article.case { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 36px 40px; min-width: 0; }
+.case-head { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: baseline; }
+.case-head h2 { font-size: clamp(28px, 3.4vw, 40px); font-weight: 800; font-stretch: 85%; line-height: 1.05; }
+.case-head .meta { font: 400 12px/1.6 var(--f-mono); color: var(--muted); text-align: right; }
+.case .summary { font-size: 20px; line-height: 1.5; margin: 18px 0 0; max-width: 60ch; }
+.diagram { margin: 30px 0 8px; border: 1px solid var(--line); border-radius: 12px; padding: 16px; overflow-x: auto; background: var(--bg); }
+.diagram svg { display: block; min-width: 680px; width: 100%; height: auto; }
+.diagram-cap { font: 400 12px/1.5 var(--f-mono); color: var(--muted); }
+.adr { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 0; margin-top: 30px; border-top: 1px solid var(--line); }
+.adr > div { padding: 16px 0; border-bottom: 1px solid var(--line); }
+.adr > div:nth-child(odd) { padding-right: 16px; }
+.adr p { margin: 0; max-width: 64ch; }
+.adr ul { margin: 0; padding-left: 18px; max-width: 64ch; }
+.adr li + li { margin-top: 6px; }
+.chip { display: inline-block; font: 500 11px/1 var(--f-mono); text-transform: uppercase; letter-spacing: .06em; padding: 6px 8px; border-radius: 6px; }
+.chip.pass { background: var(--pass-soft); color: var(--pass); }
+.chip.limit { background: var(--limit-soft); color: var(--limit); }
+.evidence { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 28px; }
+.evidence figure { margin: 0; }
+.evidence img { width: 100%; border-radius: 10px; border: 1px solid var(--line); display: block; }
+.evidence figcaption { font: 400 12px/1.5 var(--f-mono); color: var(--muted); margin-top: 8px; }
+.links { margin-top: 22px; font: 400 13px var(--f-mono); }
+
+section.more { margin-top: 72px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; border-top: 2px solid var(--ink); padding-top: 32px; }
+section.more h3 { font-size: 22px; font-weight: 800; font-stretch: 88%; margin: 10px 0 14px; }
+section.more ol, section.more ul { margin: 0; padding-left: 20px; }
+section.more li + li { margin-top: 10px; }
+section.more li b { font-family: var(--f-head); font-weight: 700; }
+footer { margin-top: 64px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; font: 400 13px/1.6 var(--f-mono); color: var(--muted); }
+
+/* diagram tokens */
+.d-box { fill: var(--paper); stroke: var(--ink); stroke-width: 1.2; }
+.d-key { fill: var(--pass-soft); stroke: var(--pass); stroke-width: 1.6; }
+.d-gate { fill: var(--limit-soft); stroke: var(--limit); stroke-width: 1.6; }
+.d-t { fill: var(--ink); font: 600 13px var(--f-head); }
+.d-s { fill: var(--muted); font: 400 10.5px var(--f-mono); }
+.d-e { stroke: var(--muted); stroke-width: 1.3; fill: none; }
+.d-e.dash { stroke-dasharray: 4 4; }
+.d-a { fill: var(--muted); }
+
+@media (max-width: 900px) {
+  .page { padding-inline: 16px; padding-block: 28px 56px; }
+  header.top { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .book { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  nav.tabs { position: static; flex-direction: row; overflow-x: auto; }
+  nav.tabs button { min-width: 200px; }
+  article.case { padding: 24px 20px; }
+  .adr { grid-template-columns: minmax(0, 1fr); }
+  .adr > div:nth-child(odd) { padding-bottom: 0; border-bottom: 0; }
+  section.more { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: no-preference) { article.case { animation: in .35s ease-out; } @keyframes in { from { transform: translateY(6px); } to { transform: none; } } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <div>
+      <span class="lbl">Minghui (James) Wang &middot; Senior AI Engineer</span>
+      <h1>I&rsquo;d rather show you the decisions than the logos.</h1>
+    </div>
+    <div>
+      <p>Four systems I designed and built, written up the way I would in a design review: the problem, the constraint, what I chose, and what it cost. Pick a case.</p>
+      <div class="log"><span><b>&#10003;</b> 1,487 tests on one live system</span><span><b>&#10003;</b> 11 AI platforms, built solo</span><span><b>&#10003;</b> 15-person team, built from zero</span></div>
+    </div>
+  </header>
+
+  <div class="book">
+    <nav class="tabs" role="tablist" aria-label="Case files" id="tabs"></nav>
+    <article class="case" id="case" role="tabpanel" aria-live="polite"></article>
+  </div>
+
+  <section class="more">
+    <div>
+      <span class="lbl">How I work</span>
+      <h3>Five habits</h3>
+      <ol>
+        <li><b>Read the business first.</b> I learn how the owner, the partner or the teacher actually works before I design anything.</li>
+        <li><b>Every AI output has an owner.</b> If a person would be blamed for it, a person approves it.</li>
+        <li><b>Test where it hurts.</b> Money, children&rsquo;s data and anything legal get the heaviest coverage.</li>
+        <li><b>Assume the model will be down.</b> FieldsBrain falls back to plain rules and keeps working.</li>
+        <li><b>Keep the stack hireable.</b> Laravel, MySQL and Redis outlive any one engineer, including me.</li>
+      </ol>
+    </div>
+    <div>
+      <span class="lbl">What I reach for</span>
+      <h3>Stack, with reasons</h3>
+      <ul>
+        <li><b>Laravel + MySQL + Redis</b> for products that have to run for years.</li>
+        <li><b>OpenAI-compatible providers</b>, with Anthropic and Gemini behind the same interface, so the model can change without a rewrite.</li>
+        <li><b>Twilio and WhatsApp Cloud API</b> for voice and messaging agents.</li>
+        <li><b>Stripe</b>, storing tokens only, never card numbers.</li>
+        <li><b>Docker and Jenkins</b> for repeatable releases.</li>
+      </ul>
+    </div>
+    <div>
+      <span class="lbl">Before I join a team</span>
+      <h3>Questions I&rsquo;d ask you</h3>
+      <ul>
+        <li>Which AI output in your product would hurt most if it were wrong, and who sees it first?</li>
+        <li>How do you find out when a model update changes behavior?</li>
+        <li>What does a new engineer ship in the first two weeks?</li>
+        <li>Where does your team want less AI, not more?</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>james.wang@apideed.com &middot; <a href="https://www.linkedin.com/in/jameswangusa">LinkedIn</a> &middot; <a href="https://github.com/apideed">GitHub</a> &middot; Frederick, MD</span>
+    <span><a href="../">&larr; One-page profile</a> &middot; Happy to walk through any of these in code.</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  function diagram(spec) {
+    var W = spec.w || 760, H = spec.h || 230, s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + spec.label + '">';
+    s += '<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="d-a" d="M0 0L10 5L0 10z"/></marker></defs>';
+    var N = {};
+    spec.nodes.forEach(function (n) { N[n.id] = n; });
+    spec.edges.forEach(function (e) {
+      var a = N[e[0]], b = N[e[1]], x1, y1, x2, y2;
+      var ac = { x: a.x + a.w / 2, y: a.y + a.h / 2 }, bc = { x: b.x + b.w / 2, y: b.y + b.h / 2 };
+      if (Math.abs(bc.x - ac.x) > Math.abs(bc.y - ac.y)) {
+        x1 = bc.x > ac.x ? a.x + a.w : a.x; y1 = ac.y; x2 = bc.x > ac.x ? b.x : b.x + b.w; y2 = bc.y;
+      } else {
+        x1 = ac.x; y1 = bc.y > ac.y ? a.y + a.h : a.y; x2 = bc.x; y2 = bc.y > ac.y ? b.y : b.y + b.h;
+      }
+      var mx = (x1 + x2) / 2;
+      var d = (Math.abs(bc.x - ac.x) > Math.abs(bc.y - ac.y)) ? 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2 : 'M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2;
+      s += '<path class="d-e' + (e[2] === 'dash' ? ' dash' : '') + '" d="' + d + '" marker-end="url(#ar)"/>';
+    });
+    spec.nodes.forEach(function (n) {
+      s += '<rect class="' + (n.k === 'key' ? 'd-key' : n.k === 'gate' ? 'd-gate' : 'd-box') + '" x="' + n.x + '" y="' + n.y + '" width="' + n.w + '" height="' + n.h + '" rx="8"/>';
+      s += '<text class="d-t" x="' + (n.x + 12) + '" y="' + (n.y + 22) + '">' + n.t + '</text>';
+      if (n.s) n.s.split('|').forEach(function (line, i) { s += '<text class="d-s" x="' + (n.x + 12) + '" y="' + (n.y + 40 + i * 14) + '">' + line + '</text>'; });
+    });
+    return s + '</svg>';
+  }
+
+  var CASES = [
+    { id: 'lawyerpara', n: '01', t: 'LawyerPara', s: 'AI inside a law firm', year: '2025 &ndash; 2026 &middot; solo build &middot; live',
+      summary: 'Law firms want AI help with drafting and client updates. One leaked client name or one unapproved message is a professional-conduct problem, so I treated the model as an outside contractor with no clearance.',
+      dia: { label: 'LawyerPara request flow with redaction, permission tiers and partner approval', h: 230, nodes: [
+        { id: 'm', x: 10, y: 40, w: 130, h: 66, t: 'Matter record', s: 'names, docs,|contacts' },
+        { id: 'r', x: 175, y: 40, w: 140, h: 66, t: 'Redaction layer', s: 'name &#8594; &quot;the client&quot;|docs never sent', k: 'key' },
+        { id: 'llm', x: 350, y: 40, w: 110, h: 66, t: 'Model', s: 'swappable|provider' },
+        { id: 't', x: 495, y: 40, w: 120, h: 66, t: 'Tier check', s: 'T0 read | T1 note|T2 draft only', k: 'key' },
+        { id: 'p', x: 640, y: 40, w: 110, h: 66, t: 'Partner', s: 'approve, edit|or dismiss', k: 'gate' },
+        { id: 'c', x: 640, y: 150, w: 110, h: 56, t: 'Client', s: 'real name back in' },
+        { id: 'log', x: 175, y: 150, w: 420, h: 56, t: 'Action log', s: 'every AI action: who asked, what it did, who approved, when' } ],
+        edges: [['m', 'r'], ['r', 'llm'], ['llm', 't'], ['t', 'p'], ['p', 'c'], ['t', 'log', 'dash'], ['r', 'log', 'dash']] },
+      adr: [
+        ['Constraint', '<p>One engineer. Firms from solo practices to multiple offices. The model runs on infrastructure the firm does not control.</p>'],
+        ['Decision', '<ul><li>Six assistants per matter, each on one of three tiers: read only, internal notes, or draft then approve.</li><li>Identities and documents are stripped before any model call. The real name returns only after a partner approves.</li><li>Patent filing cross-checks run on deterministic rules, with no model at all.</li></ul>'],
+        ['Trade-off', '<p><span class="chip pass">Accepted</span> Drafts read a little generic until approval, and partners click once more. That is cheaper than trusting a vendor with privileged data.</p>'],
+        ['Known limit', '<p><span class="chip limit">Limit</span> Deadline reminders support the firm&rsquo;s docketing. They do not replace it, and the product says so.</p>'] ],
+      ev: [['lp_office.jpg', 'Business Office: the Client Comms assistant drafts, marked &quot;Do not send&quot;.'], ['lp_ip.jpg', 'Patent cross-check: 24 facts compared, 0 sent to AI.']],
+      link: ['https://lawyerpara.com/marketing/', 'lawyerpara.com, with a read-only demo firm'] },
+
+    { id: 'geo', n: '02', t: 'Alzaro GEO Insight', s: 'Testing AI you don&rsquo;t control', year: '2025 &ndash; 2026 &middot; solo build &middot; live',
+      summary: 'Customers now ask ChatGPT who to call. Owners cannot see those answers. I built it as monitoring for a third-party system: fixed scenarios, a schedule, and a record of every run.',
+      dia: { label: 'GEO Insight testing loop', h: 230, nodes: [
+        { id: 'q', x: 10, y: 80, w: 130, h: 66, t: 'Prompt set', s: 'questions real|customers ask' },
+        { id: 'a', x: 180, y: 10, w: 120, h: 50, t: 'ChatGPT' },
+        { id: 'b', x: 180, y: 88, w: 120, h: 50, t: 'Gemini' },
+        { id: 'c', x: 180, y: 166, w: 120, h: 50, t: 'Perplexity' },
+        { id: 's', x: 340, y: 80, w: 140, h: 66, t: 'Result store', s: 'provider, model,|market, time', k: 'key' },
+        { id: 'g', x: 515, y: 80, w: 110, h: 66, t: 'Gap', s: 'missed or|wrong answers' },
+        { id: 'k', x: 515, y: 166, w: 110, h: 50, t: 'Knowledge Hub', s: 'verified facts' },
+        { id: 'h', x: 655, y: 80, w: 95, h: 66, t: 'Owner', s: 'approves page', k: 'gate' } ],
+        edges: [['q', 'a'], ['q', 'b'], ['q', 'c'], ['a', 's'], ['b', 's'], ['c', 's'], ['s', 'g'], ['g', 'h'], ['k', 'g', 'dash']] },
+      adr: [
+        ['Constraint', '<p>Answers drift between runs and between models. Samples are small. We cannot change how any assistant ranks a business.</p>'],
+        ['Decision', '<ul><li>Run the same scenarios on a schedule and store provider, model, market and timestamp with every result.</li><li>Turn each missed question into a suggested answer page, written only from facts the owner has verified.</li><li>Nothing publishes without the owner&rsquo;s approval.</li></ul>'],
+        ['Trade-off', '<p><span class="chip pass">Accepted</span> Reports show uncertainty instead of a single tidy score. When a sample is too small to mean anything, the report says so.</p>'],
+        ['Known limit', '<p><span class="chip limit">Limit</span> No tool can make an AI cite you. The product promises visibility into answers, never citations.</p>'] ],
+      ev: [['az_prompt.jpg', 'Prompt Tester: one question, three models, three outcomes.'], ['az_facts.jpg', 'Knowledge Hub: claims need a source before they go public.']],
+      link: ['https://www.alzaro.ai/marketing', 'alzaro.ai'] },
+
+    { id: 'wokrise', n: '03', t: 'Wokrise', s: 'A voice agent on a real phone line', year: '2025 &ndash; 2026 &middot; solo build &middot; live',
+      summary: 'A restaurant phone rings hardest when nobody can pick up. The agent had to be useful in a rush and easy to overrule, so I designed the hand-off before the happy path.',
+      dia: { label: 'Wokrise call handling with hand-off to staff', h: 230, nodes: [
+        { id: 'c', x: 10, y: 80, w: 110, h: 66, t: 'Caller', s: 'phone, web chat,|WhatsApp' },
+        { id: 't', x: 155, y: 80, w: 110, h: 66, t: 'Twilio', s: 'one inbox' },
+        { id: 'ai', x: 300, y: 80, w: 150, h: 66, t: 'AI host', s: 'menu, hours and|policies only', k: 'key' },
+        { id: 'o', x: 490, y: 10, w: 130, h: 56, t: 'Order or booking', s: 'POS stays as is' },
+        { id: 'st', x: 490, y: 160, w: 130, h: 56, t: 'Staff line', s: 'press 0 or|&quot;put me through&quot;', k: 'gate' },
+        { id: 'm', x: 650, y: 160, w: 100, h: 56, t: 'Message', s: 'if nobody free' },
+        { id: 'r', x: 650, y: 10, w: 100, h: 56, t: 'Record', s: 'every call kept' } ],
+        edges: [['c', 't'], ['t', 'ai'], ['ai', 'o'], ['ai', 'st'], ['st', 'm', 'dash'], ['o', 'r', 'dash']] },
+      adr: [
+        ['Constraint', '<p>Noise, accents, rush hour, and an owner who cannot babysit software.</p>'],
+        ['Decision', '<ul><li>Answer only from the restaurant&rsquo;s own material; anything else goes to staff with the full conversation.</li><li>One key or one sentence reaches a human. Staff hear who is calling before they pick up.</li><li>Replies to low-star reviews are drafted, never posted automatically. Credentials are encrypted and permissions follow roles.</li></ul>'],
+        ['Trade-off', '<p><span class="chip pass">Accepted</span> A narrow agent that hands off often beats a clever one that improvises an answer about allergies.</p>'],
+        ['Known limit', '<p><span class="chip limit">Limit</span> It runs next to the restaurant&rsquo;s existing till instead of integrating with it.</p>'] ],
+      ev: [['wk_inbox.jpg', 'One inbox: orders, a booking, a quote, and a call handed to staff (illustration from the product deck).']],
+      link: ['https://u.alzaro.ai/owner-help/sales-deck.html', 'Wokrise partner deck'] },
+
+    { id: 'aichotels', n: '04', t: 'Aichotels', s: 'Scale before AI', year: '2017 &ndash; 2020 &middot; tech lead, team of 15',
+      summary: 'A B2B2C hotel platform distributing inventory from 12 suppliers to travel platforms in China and the U.S. This is where I learned capacity planning, replication and cost.',
+      dia: { label: 'Aichotels API distribution architecture', h: 230, nodes: [
+        { id: 'sp', x: 10, y: 80, w: 120, h: 66, t: '12 suppliers', s: '10 SOAP/XML|2 REST' },
+        { id: 'lb', x: 165, y: 80, w: 120, h: 66, t: 'Load balancer', s: 'rated 10K QPS', k: 'key' },
+        { id: 'app', x: 320, y: 80, w: 130, h: 66, t: '8 app nodes', s: 'Laravel content|API' },
+        { id: 'db', x: 490, y: 10, w: 140, h: 66, t: 'MySQL', s: '1 write primary|3 CN + 1 US replicas' },
+        { id: 'rd', x: 490, y: 150, w: 140, h: 56, t: 'Redis', s: 'cache' },
+        { id: 'ota', x: 665, y: 80, w: 85, h: 66, t: 'OTAs', s: 'REST/JSON' } ],
+        edges: [['sp', 'lb'], ['lb', 'app'], ['app', 'db'], ['app', 'rd'], ['app', 'ota']] },
+      adr: [
+        ['Constraint', '<p>Peak booking traffic, a mostly China-based market, and partners in the U.S.</p>'],
+        ['Decision', '<ul><li>Read-heavy design: one write primary, read replicas near each market, Redis in front.</li><li>Moved 32 servers from AWS (U.S.) to Alibaba Cloud (China), cutting cost to one-third and speeding up China&ndash;U.S. access.</li><li>Git, Docker and Jenkins for every release; PHPUnit, Postman and SoapUI for tests.</li></ul>'],
+        ['Trade-off', '<p><span class="chip pass">Accepted</span> Keeping a U.S. read replica after the move kept U.S. partners fast at the cost of one more node to run.</p>'],
+        ['Team', '<p>Grew the U.S. team from zero to 15 while taking the platform from v0.1 to v6.0.</p>'] ],
+      ev: [], link: ['https://aichotels.com/', 'aichotels.com'] }
+  ];
+
+  var tabs = document.getElementById('tabs'), box = document.getElementById('case');
+  function show(id, focus) {
+    var c = CASES.filter(function (x) { return x.id === id; })[0] || CASES[0];
+    Array.prototype.forEach.call(tabs.children, function (b) { b.setAttribute('aria-selected', b.dataset.id === c.id ? 'true' : 'false'); b.tabIndex = b.dataset.id === c.id ? 0 : -1; });
+    var h = '<div class="case-head"><h2>' + c.t + '</h2><div class="meta">Case ' + c.n + '<br>' + c.year + '</div></div>';
+    h += '<p class="summary">' + c.summary + '</p>';
+    h += '<div class="diagram">' + diagram(c.dia) + '</div><div class="diagram-cap">Green: control I added. Orange: a person decides. Dashed: logged or optional path.</div>';
+    h += '<div class="adr">' + c.adr.map(function (r) { return '<div class="lbl">' + r[0] + '</div><div>' + r[1] + '</div>'; }).join('') + '</div>';
+    if (c.ev.length) h += '<div class="evidence">' + c.ev.map(function (e) { return '<figure><img src="' + e[0] + '" alt="" loading="lazy"><figcaption>' + e[1] + '</figcaption></figure>'; }).join('') + '</div>';
+    h += '<div class="links"><a href="' + c.link[0] + '">' + c.link[1] + ' &#8599;</a></div>';
+    box.innerHTML = h;
+    try { localStorage.setItem('casebook-tab', c.id); } catch (e) {}
+    if (focus) box.focus();
+  }
+  CASES.forEach(function (c) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = c.id; b.id = 'tab-' + c.id;
+    b.innerHTML = '<span class="n">' + c.n + '</span><span class="t">' + c.t + '</span><span class="s">' + c.s + '</span>';
+    b.addEventListener('click', function () { show(c.id); });
+    b.addEventListener('keydown', function (e) {
+      var i = CASES.indexOf(c);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); var n = CASES[(i + 1) % CASES.length]; show(n.id); document.getElementById('tab-' + n.id).focus(); }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); var p = CASES[(i - 1 + CASES.length) % CASES.length]; show(p.id); document.getElementById('tab-' + p.id).focus(); }
+    });
+    tabs.appendChild(b);
+  });
+  var start = (location.hash || '').slice(1), saved = null;
+  try { saved = localStorage.getItem('casebook-tab'); } catch (e) {}
+  show(CASES.some(function (c) { return c.id === start; }) ? start : (saved || 'lawyerpara'));
+  box.tabIndex = -1;
+})();
+</script>
+</body>
+</html>

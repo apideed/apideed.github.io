@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ground Truth | AI 落地手记 | James Wang</title>
+<meta name="description" content="Ground Truth by James Wang: case notes on putting AI into real businesses, and forward-deployed engineering for companies that want AI that works.">
+<meta name="author" content="Minghui (James) Wang">
+<link rel="canonical" href="https://apideed.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ground Truth">
+<meta property="og:title" content="Ground Truth | AI that survives contact with a real business">
+<meta property="og:description" content="Ground Truth by James Wang: case notes on putting AI into real businesses, and forward-deployed engineering for companies that want AI that works.">
+<meta property="og:url" content="https://apideed.com/">
+<meta property="og:image" content="https://apideed.com/ep00.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3 L21 19 H3 Z' fill='none' stroke='%23141819' stroke-width='1.8'/%3E%3Ccircle cx='12' cy='14' r='2.2' fill='%230D6A66'/%3E%3C/svg%3E">
+<style>html,body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap">
+<style>
+/* Layout: a survey-office field journal. Contour-map hero with a live deployment trace, then a case library, an engagement method, an owner's readiness check, and a learning shelf. */
+:root {
+  --bg: #F1F2EF; --paper: #FAFAF8; --ink: #141819; --muted: #59615F; --line: #D6DAD6; --line-2: #E6E9E5;
+  --teal: #0D6A66; --teal-soft: #DCEBE8; --brass: #A47A2E; --brass-soft: #F1E7D3; --ok: #2F7A4C; --stop: #B04A2A;
+  --term-bg: #121717; --term-ink: #D9E2DF; --term-dim: #7E8C88;
+  --f-display: 'Schibsted Grotesk', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
+  --f-body: 'Source Serif 4', 'Noto Serif SC', Georgia, serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0D1112; --paper: #131819; --ink: #E4E9E7; --muted: #95A19D; --line: #263031; --line-2: #1C2425;
+  --teal: #5CC3B6; --teal-soft: #15302D; --brass: #D8AE62; --brass-soft: #2E2615; --ok: #78C795; --stop: #E38A6A;
+  --term-bg: #080B0B; --term-ink: #D9E2DF; --term-dim: #6E7B78; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0D1112; --paper: #131819; --ink: #E4E9E7; --muted: #95A19D; --line: #263031; --line-2: #1C2425;
+  --teal: #5CC3B6; --teal-soft: #15302D; --brass: #D8AE62; --brass-soft: #2E2615; --ok: #78C795; --stop: #E38A6A;
+  --term-bg: #080B0B; --term-ink: #D9E2DF; --term-dim: #6E7B78; color-scheme: dark }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.65 var(--f-body); }
+body[data-l="en"] [lang="zh"], body[data-l="zh"] [lang="en"] { display: none !important; }
+body[data-l="zh"] { font-size: 17px; line-height: 1.8; }
+a { color: var(--teal); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
+.w { max-width: 1180px; margin: 0 auto; padding-inline: 28px; }
+h1, h2, h3, h4 { font-family: var(--f-display); margin: 0; text-wrap: balance; }
+.eyebrow { font: 500 12px/1.4 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.eyebrow b { color: var(--teal); font-weight: 500; }
+.sec { padding-block: 96px; border-top: 1px solid var(--line); }
+.sec-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 48px; align-items: end; margin-bottom: 44px; }
+.sec-head h2 { font-size: clamp(32px, 4.2vw, 52px); line-height: 1.02; font-weight: 700; letter-spacing: -.025em; margin-top: 12px; }
+.sec-head p { margin: 0; color: var(--muted); max-width: 54ch; }
+
+/* Nav */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.nav .w { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 62px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font: 700 17px var(--f-display); letter-spacing: -.01em; }
+.brand svg { width: 24px; height: 24px; }
+.nav nav { display: flex; gap: 22px; align-items: center; }
+.nav nav a { color: var(--ink); text-decoration: none; font: 500 14px var(--f-display); }
+.nav nav a:hover { color: var(--teal); }
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.lang button { all: unset; cursor: pointer; font: 500 12px/1 var(--f-mono); padding: 6px 10px; border-radius: 999px; color: var(--muted); }
+.lang button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+/* Hero */
+.hero { position: relative; overflow: hidden; }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero .w { position: relative; padding-block: 88px 80px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 56px; align-items: center; }
+.hero h1 { font-size: clamp(42px, 6.2vw, 84px); line-height: .98; font-weight: 800; letter-spacing: -.035em; margin-top: 18px; }
+body[data-l="zh"] .hero h1 { letter-spacing: 0; line-height: 1.12; font-weight: 700; }
+.hero h1 em { font-style: normal; color: var(--teal); }
+.hero .lede { font-size: 21px; line-height: 1.55; margin: 26px 0 0; max-width: 40ch; }
+.fde { margin-top: 22px; padding: 14px 18px; border-left: 3px solid var(--brass); background: color-mix(in srgb, var(--paper) 80%, transparent); font-size: 16px; line-height: 1.55; max-width: 52ch; }
+.fde b { font-family: var(--f-display); }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.btn { display: inline-flex; align-items: center; gap: 10px; font: 600 15px var(--f-display); text-decoration: none; padding: 13px 20px; border-radius: 10px; border: 1px solid var(--ink); color: var(--ink); background: transparent; cursor: pointer; }
+.btn.solid { background: var(--ink); color: var(--bg); }
+.btn:hover { border-color: var(--teal); color: var(--teal); }
+.btn.solid:hover { background: var(--teal); color: var(--bg); }
+.btn small { font: 400 12px var(--f-mono); opacity: .7; }
+
+.term { background: var(--term-bg); color: var(--term-ink); border-radius: 14px; overflow: hidden; box-shadow: 0 30px 60px -30px rgba(0,0,0,.45); border: 1px solid color-mix(in srgb, var(--term-ink) 12%, transparent); min-width: 0; }
+.term-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid color-mix(in srgb, var(--term-ink) 10%, transparent); font: 500 11px var(--f-mono); color: var(--term-dim); letter-spacing: .06em; text-transform: uppercase; }
+.term-top .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #5CC3B6; margin-right: 8px; }
+.term ol { list-style: none; margin: 0; padding: 14px 0; font: 400 12.5px/1.75 var(--f-mono); overflow-x: auto; }
+.term li { display: grid; grid-template-columns: 66px 66px minmax(0, 1fr); gap: 10px; padding: 1px 16px; transition: background .3s; }
+.term li span:not(:last-child) { white-space: nowrap; }
+.term li .t { color: var(--term-dim); }
+.term li .k { color: #5CC3B6; }
+.term li.gate .k { color: #D8AE62; }
+.term li.on { background: color-mix(in srgb, #5CC3B6 14%, transparent); }
+.term-foot { padding: 10px 16px 14px; font: 400 11px var(--f-mono); color: var(--term-dim); border-top: 1px solid color-mix(in srgb, var(--term-ink) 10%, transparent); }
+
+.proof { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--paper); }
+.proof .w { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.proof div.p { padding: 26px 24px 26px 0; }
+.proof div.p + div.p { border-left: 1px solid var(--line); padding-left: 24px; }
+.proof b { display: block; font: 700 40px/1 var(--f-display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.proof span { display: block; margin-top: 8px; font-size: 15px; color: var(--muted); line-height: 1.4; }
+
+/* Cases */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.filters button { all: unset; cursor: pointer; font: 500 13px var(--f-display); padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.filters button[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); background: var(--paper); }
+.cases { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.case { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.case-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.case .ind { font: 500 12px var(--f-mono); color: var(--teal); text-transform: uppercase; letter-spacing: .08em; }
+.case .nm { font: 500 13px var(--f-mono); color: var(--muted); }
+.case blockquote { margin: 0; font: italic 400 25px/1.3 var(--f-body); }
+body[data-l="zh"] .case blockquote { font-style: normal; font-weight: 600; font-size: 22px; }
+.ba { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 6px 14px; font-size: 16px; line-height: 1.5; border-top: 1px solid var(--line-2); padding-top: 14px; }
+.ba dt { font: 500 11px/1.9 var(--f-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.ba dd { margin: 0; }
+.ba dd.g { color: var(--ink); }
+.ba dt.g { color: var(--brass); }
+.stack { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 6px; }
+.stack span { font: 400 11.5px var(--f-mono); padding: 4px 8px; border-radius: 6px; background: var(--line-2); color: var(--muted); }
+.case a.more { font: 500 13px var(--f-mono); }
+.case.next { background: transparent; border-style: dashed; justify-content: flex-start; }
+
+/* Method */
+.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 2px solid var(--ink); }
+.step { padding: 24px 24px 8px 0; position: relative; }
+.step + .step { padding-left: 24px; border-left: 1px solid var(--line); }
+.step .n { font: 500 13px var(--f-mono); color: var(--brass); }
+.step h3 { font-size: 23px; letter-spacing: -.015em; margin: 6px 0 4px; }
+.step .dur { font: 400 12px var(--f-mono); color: var(--muted); }
+.step p { font-size: 16px; line-height: 1.55; margin: 12px 0 0; }
+.step .out { margin-top: 14px; font-size: 14px; color: var(--muted); }
+.step .out b { font-family: var(--f-display); color: var(--ink); font-weight: 600; }
+.method-note { margin-top: 36px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.method-note div { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; font-size: 15px; line-height: 1.5; }
+.method-note b { display: block; font: 600 15px var(--f-display); margin-bottom: 4px; }
+
+/* Readiness */
+.ready { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 28px; align-items: start; }
+.qs { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 8px 24px; }
+.q { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line-2); }
+.q:last-child { border-bottom: 0; }
+.q span { font-size: 17px; line-height: 1.45; min-width: 0; }
+.yn { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; flex: none; }
+.yn button { all: unset; cursor: pointer; font: 500 13px var(--f-display); padding: 8px 14px; color: var(--muted); }
+.yn button + button { border-left: 1px solid var(--line); }
+.yn button[aria-pressed="true"].y { background: var(--teal); color: var(--bg); }
+.yn button[aria-pressed="true"].n { background: var(--ink); color: var(--bg); }
+.result { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); background: var(--ink); color: var(--bg); border-radius: 16px; padding: 28px; }
+.result .eyebrow { color: color-mix(in srgb, var(--bg) 60%, var(--ink)); }
+.meter { display: flex; gap: 5px; margin: 16px 0 18px; }
+.meter i { flex: 1; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--bg) 18%, var(--ink)); }
+.meter i.on { background: var(--brass); }
+.result h3 { font-size: 26px; line-height: 1.15; letter-spacing: -.015em; }
+.result p { font-size: 16px; line-height: 1.55; margin: 12px 0 0; color: color-mix(in srgb, var(--bg) 82%, var(--ink)); }
+.result .btn { margin-top: 20px; border-color: var(--bg); color: var(--bg); }
+.result .btn:hover { border-color: var(--brass); color: var(--brass); }
+
+/* Learn */
+.learn-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 48px; }
+.tracks { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line); }
+.tracks div { padding: 20px 0; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; }
+.tracks .k { font: 500 12px/1.6 var(--f-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--teal); }
+.tracks h4 { font-size: 19px; letter-spacing: -.01em; }
+.tracks p { margin: 4px 0 0; font-size: 16px; color: var(--muted); line-height: 1.5; }
+.shelf { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.shelf a { display: block; text-decoration: none; color: var(--ink); }
+.shelf img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); display: block; }
+.shelf .cap { font: 400 12px/1.4 var(--f-mono); color: var(--muted); margin-top: 8px; }
+.shelf-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+.shelf-head h3 { font-size: 22px; letter-spacing: -.01em; }
+
+/* About + contact */
+.about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+.about .story p { margin: 0 0 16px; max-width: 56ch; }
+.about .story p:first-child { font-size: 22px; line-height: 1.5; }
+.timeline { font: 400 13px/1.6 var(--f-mono); color: var(--muted); display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 8px 14px; margin-top: 24px; }
+.timeline b { color: var(--teal); font-weight: 500; }
+.contact { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 30px; }
+.contact h3 { font-size: 28px; letter-spacing: -.02em; }
+.contact ul { margin: 16px 0 0; padding-left: 20px; font-size: 16px; }
+.contact li + li { margin-top: 6px; }
+.addr { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 22px; padding: 14px 16px; border: 1px dashed var(--line); border-radius: 10px; }
+.addr span { font: 500 15px var(--f-mono); user-select: all; overflow-wrap: anywhere; min-width: 0; }
+footer { border-top: 1px solid var(--line); }
+footer .w { padding-block: 28px 44px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font: 400 13px var(--f-mono); color: var(--muted); }
+
+@media (max-width: 980px) {
+  .hero .w, .sec-head, .ready, .learn-grid, .about { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .step:nth-child(3) { border-left: 0; padding-left: 0; }
+  .step:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .cases { grid-template-columns: minmax(0, 1fr); }
+  .method-note { grid-template-columns: minmax(0, 1fr); }
+  .result { position: static; }
+  .proof .w { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .proof div.p:nth-child(3) { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); }
+  .proof div.p:nth-child(4) { border-top: 1px solid var(--line); }
+  .nav nav a.opt { display: none; }
+}
+@media (max-width: 600px) {
+  .w { padding-inline: 16px; }
+  .sec { padding-block: 64px; }
+  .hero .w { padding-block: 48px 48px; }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .step + .step { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); }
+  .shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tracks div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .q { flex-direction: column; align-items: flex-start; }
+  .case { padding: 22px; }
+  .nav nav a { display: none; }
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="w">
+    <a class="brand" href="#top" aria-label="Ground Truth home">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 L21 19 H3 Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="14" r="2" fill="var(--teal)"/></svg>
+      <span lang="en">Ground Truth</span><span lang="zh">Ground Truth &middot; AI 落地手记</span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#cases"><span lang="en">Cases</span><span lang="zh">案例</span></a>
+      <a href="#method" class="opt"><span lang="en">How I work</span><span lang="zh">合作方式</span></a>
+      <a href="#learn" class="opt"><span lang="en">Learn</span><span lang="zh">学习</span></a>
+      <a href="#contact"><span lang="en">Work with me</span><span lang="zh">找我合作</span></a>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-set="en" aria-pressed="true">EN</button><button type="button" data-set="zh" aria-pressed="false">中文</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <canvas id="topo" aria-hidden="true"></canvas>
+  <div class="w">
+    <div>
+      <div class="eyebrow"><b>Ground Truth</b> &middot; <span lang="en">case notes from AI in real businesses</span><span lang="zh">真实企业的 AI 落地案例</span></div>
+      <h1><span lang="en">AI that survives contact with a <em>real business.</em></span><span lang="zh">让 AI 在<em>真实的生意</em>里活下来。</span></h1>
+      <p class="lede"><span lang="en">I&rsquo;m James Wang. I put AI into law offices, restaurants, schools and job sites, then write down what worked, what broke, and why.</span><span lang="zh">我是 James Wang。我把 AI 做进律所、餐厅、学校和施工现场，再把哪些有效、哪些出了问题、为什么，一条条写下来。</span></p>
+      <div class="fde"><span lang="en"><b>Forward-deployed engineer.</b> I work inside your operation, ship the system with your team, and stay until your people run it without me.</span><span lang="zh"><b>FDE，前线部署工程师。</b>我进到你的业务现场，和你的团队一起把系统做出来、跑起来，直到不需要我也能运转。</span></div>
+      <div class="ctas">
+        <a class="btn solid" href="#ready"><span lang="en">I run a business</span><span lang="zh">我是企业主</span> <small>&rarr; <span lang="en">readiness check</span><span lang="zh">先做自测</span></small></a>
+        <a class="btn" href="#learn"><span lang="en">I want to learn</span><span lang="zh">我想学 AI</span> <small>&rarr; <span lang="en">case notes</span><span lang="zh">看案例</span></small></a>
+      </div>
+    </div>
+    <div class="term" aria-label="Illustrative request trace from LawyerPara">
+      <div class="term-top"><span><span class="dot"></span>trace &middot; lawyerpara</span><span lang="en">illustrative</span><span lang="zh">示意</span></div>
+      <ol id="trace">
+        <li><span class="t">09:47:12</span><span class="k">intake</span><span>client message &middot; matter NV-218</span></li>
+        <li><span class="t">09:47:12</span><span class="k">redact</span><span>2 names &rarr; &quot;the client&quot; &middot; 1 file withheld</span></li>
+        <li><span class="t">09:47:13</span><span class="k">retrieve</span><span>firm policy &middot; fee schedule v3</span></li>
+        <li><span class="t">09:47:14</span><span class="k">model</span><span>draft status update &middot; provider: swappable</span></li>
+        <li class="gate"><span class="t">09:47:14</span><span class="k">tier</span><span>Client Comms = T2 &middot; send blocked</span></li>
+        <li class="gate"><span class="t">09:47:15</span><span class="k">queue</span><span>waiting for partner approval</span></li>
+        <li class="gate"><span class="t">09:52:30</span><span class="k">approve</span><span>partner edited 2 lines &middot; approved</span></li>
+        <li><span class="t">09:52:30</span><span class="k">restore</span><span>client name re-inserted</span></li>
+        <li><span class="t">09:52:31</span><span class="k">send</span><span>delivered &middot; logged with approver</span></li>
+      </ol>
+      <div class="term-foot"><span lang="en">Gold lines: a person decides. The model never sees the client&rsquo;s name.</span><span lang="zh">金色行：由人来决定。模型从头到尾看不到客户的名字。</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="proof">
+  <div class="w">
+    <div class="p"><b>11</b><span lang="en">AI platforms built and run in production</span><span lang="zh">个 AI 平台，独立开发并上线运行</span></div>
+    <div class="p"><b>7</b><span lang="en">industries: legal, food, education, trades, retail, media, nonprofit</span><span lang="zh">个行业：法律、餐饮、教育、施工、零售、媒体、公益</span></div>
+    <div class="p"><b>1,487</b><span lang="en">automated tests on one live school system</span><span lang="zh">个自动化测试，守护一套在用的学校系统</span></div>
+    <div class="p"><b>23</b><span lang="en">years shipping software, from Harbin to the U.S.</span><span lang="zh">年软件交付，从哈尔滨到美国</span></div>
+  </div>
+</div>
+
+<section class="sec" id="cases">
+  <div class="w">
+    <div class="sec-head">
+      <div><div class="eyebrow"><b>01</b> &middot; <span lang="en">Case library</span><span lang="zh">案例库</span></div>
+        <h2><span lang="en">Every case starts with something an owner actually said.</span><span lang="zh">每个案例，都从老板说的一句真话开始。</span></h2></div>
+      <p><span lang="en">For each one: the problem in plain words, what shipped, the guardrail that made people trust it, and the stack underneath. Filter by your industry.</span><span lang="zh">每个案例都写清楚四件事：问题本身、最后交付了什么、让人敢用的那道防线、底层用了什么技术。可以按行业筛选。</span></p>
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Filter by industry"></div>
+    <div class="cases" id="caseGrid"></div>
+  </div>
+</section>
+
+<section class="sec" id="method">
+  <div class="w">
+    <div class="sec-head">
+      <div><div class="eyebrow"><b>02</b> &middot; <span lang="en">How an engagement runs</span><span lang="zh">合作流程</span></div>
+        <h2><span lang="en">One workflow, shipped to real users, then handed over.</span><span lang="zh">先做一个流程，上线给真实用户，再交给你的团队。</span></h2></div>
+      <p><span lang="en">Most AI projects stall because they start too wide. I start with the one task that costs you the most time, and I don&rsquo;t leave until someone on your team owns it.</span><span lang="zh">很多 AI 项目卡住，是因为一开始铺得太大。我从最耗你时间的那一件事入手，直到你团队里有人能接手才离开。</span></p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="n">Step 1</div><h3><span lang="en">Sit in</span><span lang="zh">进现场</span></h3><div class="dur"><span lang="en">1 to 2 days</span><span lang="zh">1 到 2 天</span></div>
+        <p><span lang="en">I watch the work, collect real examples, and find where hours and customers are lost.</span><span lang="zh">看你们实际怎么干活，收集真实样本，找出时间和客户在哪里流失。</span></p>
+        <div class="out"><b lang="en">You get:</b><b lang="zh">交付：</b> <span lang="en">a one-page problem brief</span><span lang="zh">一页问题说明</span></div></div>
+      <div class="step"><div class="n">Step 2</div><h3><span lang="en">Map the risk</span><span lang="zh">画出风险</span></h3><div class="dur"><span lang="en">about 1 week</span><span lang="zh">约 1 周</span></div>
+        <p><span lang="en">Pick one workflow. Decide what the AI may read, write and send, and which number will prove it worked.</span><span lang="zh">选定一个流程。定清楚 AI 能读什么、写什么、发什么，以及用哪个数字证明有效。</span></p>
+        <div class="out"><b lang="en">You get:</b><b lang="zh">交付：</b> <span lang="en">permissions and a success metric</span><span lang="zh">权限表和成功指标</span></div></div>
+      <div class="step"><div class="n">Step 3</div><h3><span lang="en">Pilot</span><span lang="zh">小范围试点</span></h3><div class="dur"><span lang="en">2 to 4 weeks</span><span lang="zh">2 到 4 周</span></div>
+        <p><span lang="en">Ship a narrow version to real users with human approval switched on. Fix what they hit.</span><span lang="zh">把收窄后的版本交给真实用户，保留人工审批，用到哪里不顺就修哪里。</span></p>
+        <div class="out"><b lang="en">You get:</b><b lang="zh">交付：</b> <span lang="en">a working system and its logs</span><span lang="zh">能用的系统和完整日志</span></div></div>
+      <div class="step"><div class="n">Step 4</div><h3><span lang="en">Harden and hand over</span><span lang="zh">加固并交接</span></h3><div class="dur"><span lang="en">1 to 2 weeks</span><span lang="zh">1 到 2 周</span></div>
+        <p><span lang="en">Tests, audit logs, fallbacks for when the model is down, and training for the person who will own it.</span><span lang="zh">补齐测试、审计日志、模型宕机时的兜底方案，并培训以后负责它的人。</span></p>
+        <div class="out"><b lang="en">You get:</b><b lang="zh">交付：</b> <span lang="en">docs, runbook and an owner</span><span lang="zh">文档、运维手册和负责人</span></div></div>
+    </div>
+    <div class="method-note">
+      <div><b lang="en">The AI drafts. A person approves.</b><b lang="zh">AI 起草，人来拍板。</b><span lang="en">Anything that reaches a customer goes past someone on your team first.</span><span lang="zh">凡是发给客户的内容，都先经过你团队里的人。</span></div>
+      <div><b lang="en">Your data stays yours.</b><b lang="zh">数据始终是你的。</b><span lang="en">Sensitive fields stay out of the model, and everything is exportable.</span><span lang="zh">敏感信息不进模型，所有数据随时可导出。</span></div>
+      <div><b lang="en">No lock-in.</b><b lang="zh">不绑定。</b><span lang="en">Mainstream stack, swappable model providers, and code your next engineer can read.</span><span lang="zh">主流技术栈，模型供应商可替换，下一个工程师也看得懂代码。</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="ready">
+  <div class="w">
+    <div class="sec-head">
+      <div><div class="eyebrow"><b>03</b> &middot; <span lang="en">For business owners</span><span lang="zh">给企业主</span></div>
+        <h2><span lang="en">Is your business ready for an AI pilot?</span><span lang="zh">你的生意，适合做 AI 试点吗？</span></h2></div>
+      <p><span lang="en">Six questions, about a minute. Your answers stay in this browser. The result tells you where I would start.</span><span lang="zh">六个问题，大约一分钟。答案只保存在你自己的浏览器里，结果会告诉你我会从哪里入手。</span></p>
+    </div>
+    <div class="ready">
+      <div class="qs" id="qs"></div>
+      <aside class="result" aria-live="polite">
+        <div class="eyebrow" id="rScore"></div>
+        <div class="meter" id="meter"></div>
+        <h3 id="rTitle"></h3>
+        <p id="rBody"></p>
+        <a class="btn" href="#contact"><span lang="en">Talk it through with me</span><span lang="zh">和我聊聊</span> &rarr;</a>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="learn">
+  <div class="w">
+    <div class="sec-head">
+      <div><div class="eyebrow"><b>04</b> &middot; <span lang="en">For learners and students</span><span lang="zh">给想学 AI 的人</span></div>
+        <h2><span lang="en">Learn the part tutorials skip.</span><span lang="zh">学教程里不讲的那部分。</span></h2></div>
+      <p><span lang="en">Prompting is a small part of the job. The rest is understanding a business, drawing the boundaries, and keeping the system alive after launch. That is what I write about.</span><span lang="zh">写提示词只是工作里很小的一部分。剩下的，是读懂一门生意、划清 AI 的边界、上线以后让系统活下去。我写的就是这些。</span></p>
+    </div>
+    <div class="learn-grid">
+      <div class="tracks">
+        <div><span class="k" lang="en">Case notes</span><span class="k" lang="zh">案例拆解</span><div><h4 lang="en">One real deployment per episode</h4><h4 lang="zh">每集拆一个真实项目</h4><p lang="en">The problem, the architecture, the guardrail, and the trade-off I made.</p><p lang="zh">问题、架构、防线，以及我做了什么取舍。</p></div></div>
+        <div><span class="k" lang="en">Diagrams</span><span class="k" lang="zh">架构图</span><div><h4 lang="en">How the pieces connect</h4><h4 lang="zh">各个部件怎么连起来</h4><p lang="en">RAG, permission tiers, voice hand-offs and model fallbacks, drawn plainly.</p><p lang="zh">RAG、权限分级、语音转人工、模型兜底，用最直白的图讲清楚。</p></div></div>
+        <div><span class="k" lang="en">Mistakes</span><span class="k" lang="zh">踩过的坑</span><div><h4 lang="en">What broke and what I changed</h4><h4 lang="zh">哪里出了问题，我改了什么</h4><p lang="en">The lessons that only show up after real users arrive.</p><p lang="zh">只有真实用户进来之后，才会暴露的问题。</p></div></div>
+        <div><span class="k" lang="en">Path</span><span class="k" lang="zh">成长路径</span><div><h4 lang="en">From developer to forward-deployed engineer</h4><h4 lang="zh">从开发者到 FDE</h4><p lang="en">The skills I&rsquo;d learn again, in the order I&rsquo;d learn them.</p><p lang="zh">如果重来一次，我会按什么顺序学哪些本事。</p></div></div>
+      </div>
+      <div>
+        <div class="shelf-head"><h3><span lang="en">Season 1: Built in Production</span><span lang="zh">第一季：Built in Production</span></h3><span class="eyebrow" id="epCount"></span></div>
+        <div class="shelf" id="shelf"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="contact">
+  <div class="w about">
+    <div class="story">
+      <div class="eyebrow"><b>05</b> &middot; <span lang="en">About</span><span lang="zh">关于我</span></div>
+      <p style="margin-top:14px"><span lang="en">I started out teaching web design in Harbin and building websites for American companies from the other side of the world. Twenty-three years later, I build AI for the law office and the restaurant down the road.</span><span lang="zh">我从哈尔滨的一间教室起步，教网页设计，也隔着半个地球给美国公司做网站。二十三年后，我在给街角的律所和餐厅做 AI。</span></p>
+      <p><span lang="en">Along the way I led a 15-person engineering team, ran booking systems behind a load balancer rated at 10K requests per second, and built manufacturing software under FDA rules. Today I&rsquo;m CTO of AAWEA, a nonprofit for entrepreneurs, and a senior engineer at QIAGEN.</span><span lang="zh">这一路上，我带过 15 人的研发团队，做过承载每秒上万请求的酒店预订系统，也做过符合 FDA 规范的生产管理软件。现在我是创业者公益组织 AAWEA 的 CTO，同时在 QIAGEN 做高级工程师。</span></p>
+      <div class="timeline">
+        <b>1999</b><span lang="en">Instructor, Harbin University of Science &amp; Technology</span><span lang="zh">哈尔滨理工大学，网页设计讲师</span>
+        <b>2003</b><span lang="en">Web developer to tech lead, Harbin</span><span lang="zh">哈尔滨，从开发做到技术负责人</span>
+        <b>2013</b><span lang="en">Moved to the U.S.; led a team from zero to 15</span><span lang="zh">来到美国，团队从 0 带到 15 人</span>
+        <b>2021</b><span lang="en">Senior Software Engineer, QIAGEN</span><span lang="zh">QIAGEN 高级软件工程师</span>
+        <b>2025</b><span lang="en">CTO, AAWEA; 11 AI platforms since</span><span lang="zh">AAWEA CTO，至今上线 11 个 AI 平台</span>
+      </div>
+    </div>
+    <div class="contact">
+      <div class="eyebrow"><span lang="en">Work with me</span><span lang="zh">找我合作</span></div>
+      <h3 style="margin-top:10px"><span lang="en">Bring me one problem, not a strategy.</span><span lang="zh">带一个具体问题来，不用带战略。</span></h3>
+      <p style="margin:12px 0 0;font-size:16px;color:var(--muted)"><span lang="en">Email me three things and I&rsquo;ll tell you honestly whether AI is the right tool:</span><span lang="zh">发邮件告诉我这三件事，我会如实告诉你 AI 是不是合适的工具：</span></p>
+      <ul>
+        <li><span lang="en">What your business does, and how many people work there</span><span lang="zh">你做什么生意，团队有多少人</span></li>
+        <li><span lang="en">The task that eats the most hours every week</span><span lang="zh">每周最耗时间的那件事</span></li>
+        <li><span lang="en">What a good result would look like in numbers</span><span lang="zh">做成了，用什么数字来衡量</span></li>
+      </ul>
+      <div class="addr"><span id="mail">james.wang@apideed.com</span><button class="btn" type="button" id="copyMail" style="padding:8px 14px"><span lang="en">Copy</span><span lang="zh">复制</span></button></div>
+      <p style="margin:16px 0 0;font-size:15px"><a href="https://www.linkedin.com/in/jameswangusa">LinkedIn &middot; jameswangusa &#8599;</a> &nbsp;&middot;&nbsp; <a href="https://apideed.github.io/">Resume &amp; casebook &#8599;</a></p>
+    </div>
+  </div>
+</section>
+
+<footer><div class="w"><span>Ground Truth &middot; James Wang</span><span lang="en">Frederick, Maryland &middot; working with businesses across the U.S.</span><span lang="zh">美国马里兰州 Frederick &middot; 服务全美企业</span></div></footer>
+
+<script>
+(function () {
+  var body = document.body;
+  /* Language */
+  function setLang(l) {
+    body.dataset.l = l; document.documentElement.lang = l === 'zh' ? 'zh-CN' : 'en';
+    document.querySelectorAll('.lang button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.set === l ? 'true' : 'false'); });
+    try { localStorage.setItem('gt-lang', l); } catch (e) {}
+    renderAll();
+  }
+  document.querySelectorAll('.lang button').forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.set); }); });
+  var L = 'en'; try { L = localStorage.getItem('gt-lang') || (/^zh/i.test(navigator.language || '') ? 'zh' : 'en'); } catch (e) {}
+  body.dataset.l = L;
+  var T = function (en, zh) { return body.dataset.l === 'zh' ? zh : en; };
+
+  /* Cases */
+  var CASES = [
+    { ind: ['legal', 'Legal', '法律'], nm: 'LawyerPara', q: ['What does the AI see?', '“AI 到底能看到什么？”'],
+      before: ['Partners wanted help drafting, but couldn&rsquo;t risk a leaked name or an unapproved message.', '合伙人想用 AI 起草，但承担不起泄露客户姓名或未经批准就发出去的风险。'],
+      shipped: ['Six AI assistants per case on three permission tiers, from read only to draft-then-approve.', '每个案件配 6 个 AI 助手，分三级权限：从只读，到只能起草、由人批准。'],
+      guard: ['Names masked before every model call. Documents never sent. Every action logged.', '每次调用模型前先遮蔽姓名，文件从不外发，每个动作都有记录。'],
+      stack: ['Laravel', 'MySQL', 'LLM API', 'RAG', 'Stripe'], url: 'https://lawyerpara.com/marketing/' },
+    { ind: ['food', 'Restaurants', '餐饮'], nm: 'Wokrise', q: ['Three calls at once, and one of me.', '“三个电话同时响，店里就我一个人。”'],
+      before: ['Missed calls at lunch rush meant missed orders.', '午餐高峰漏接电话，就是漏掉订单。'],
+      shipped: ['A voice and WhatsApp host that takes orders and bookings from the menu.', '一个语音和 WhatsApp 前台，按菜单接单、订位。'],
+      guard: ['Press 0 to reach staff. Low-star review replies are drafted, never auto-posted.', '按 0 直接转人工。差评回复只起草，绝不自动发布。'],
+      stack: ['Twilio', 'WhatsApp Cloud API', 'Voice AI', 'RAG'], url: 'https://u.alzaro.ai/owner-help/sales-deck.html' },
+    { ind: ['retail', 'Local business', '本地商家'], nm: 'Alzaro', q: ['When people ask ChatGPT, does it know us?', '“顾客去问 ChatGPT，它知道我们吗？”'],
+      before: ['Customers ask AI assistants for recommendations. Owners can&rsquo;t see the answers.', '顾客越来越多地让 AI 推荐商家，老板却看不到 AI 是怎么回答的。'],
+      shipped: ['Scheduled prompt tests across ChatGPT, Gemini and Perplexity, plus AI teammates for content.', '定期在 ChatGPT、Gemini、Perplexity 上做提问测试，再配 AI 员工写内容。'],
+      guard: ['Every claim comes from a Knowledge Hub the owner has verified. Nothing publishes unapproved.', '所有说法都来自老板核实过的知识库，未经批准一律不发布。'],
+      stack: ['LLM evaluation', 'RAG', 'Scheduler', 'SEO / GEO'], url: 'https://www.alzaro.ai/marketing' },
+    { ind: ['edu', 'Education', '教育'], nm: 'Tegaia', q: ['Don&rsquo;t give them the answer.', '“别直接把答案告诉孩子。”'],
+      before: ['General chatbots do students&rsquo; homework for them.', '通用聊天机器人会直接替学生把作业做完。'],
+      shipped: ['A tutor bounded to the lesson, with practice tuned to 70&ndash;85% correct.', '只围绕当前课程的 AI 家教，练习难度控制在 70% 到 85% 的正确率。'],
+      guard: ['Hints instead of answers. Stuck students go to a real guide. No screen recording.', '只给提示不给答案，卡住了就转给真人老师，不录屏。'],
+      stack: ['LLM API', 'Adaptive practice', 'Mastery model'], url: 'https://tegaia.com/marketing/indexv2.html' },
+    { ind: ['edu', 'Education', '教育'], nm: 'Cary Learning Academy', q: ['Parents keep calling to ask about tuition.', '“家长总打电话来问学费。”'],
+      before: ['Billing, sign-ups and pick-ups ran on spreadsheets and phone calls.', '收费、报名、接送全靠表格和电话。'],
+      shipped: ['A full school system with a tuition calculator, billing, attendance and an AI course builder.', '一整套校务系统：学费计算器、账单、考勤，加上 AI 备课。'],
+      guard: ['1,487 automated tests. No card numbers stored. AI course drafts publish only after a teacher reviews them.', '1,487 个自动化测试，不存银行卡号，AI 生成的课程必须老师审过才能发布。'],
+      stack: ['Laravel', 'MySQL', 'Stripe', 'PHPUnit'], url: 'https://cary.aawea.org/marketing/' },
+    { ind: ['trades', 'Trades', '施工'], nm: 'FieldsBrain', q: ['Let me quote it before I leave the site.', '“我想在离开工地前就把报价给出去。”'],
+      before: ['Quotes were written at night from memory and notes on paper.', '报价都是晚上凭记忆和纸上笔记写的。'],
+      shipped: ['AI drafts line items from a job description and site photos.', 'AI 根据工作描述和现场照片起草报价明细。'],
+      guard: ['Every AI result is labelled and editable. If the AI is down, built-in rules take over.', '每条 AI 结果都有标注、可修改；AI 不可用时，系统自动切回内置规则。'],
+      stack: ['Multimodal LLM', 'iOS / Android', 'Rules fallback'], url: 'https://fieldsbrain.com/marketing' },
+    { ind: ['media', 'Media', '媒体'], nm: 'Alzaro Ads', q: ['I can&rsquo;t make a video every day.', '“我没法每天做一条视频。”'],
+      before: ['Script, voice, captions and editing took a team.', '脚本、配音、字幕、剪辑，样样都要人。'],
+      shipped: ['A pipeline that chains an LLM, text-to-speech, image generation and word-aligned captions.', '一条流水线，串起大模型写稿、语音合成、图像生成和逐字对齐字幕。'],
+      guard: ['Redo one scene, pay for one scene. Costs quoted up front; failed jobs refunded.', '只重做一个镜头就只付一个镜头的钱。先报价再开工，失败全额退回。'],
+      stack: ['LLM', 'TTS', 'STT', 'Image gen', 'Queue'], url: 'https://ads.aawea.org/marketing/' }
+  ];
+  var FILTERS = [['all', 'All', '全部'], ['legal', 'Legal', '法律'], ['food', 'Restaurants', '餐饮'], ['retail', 'Local business', '本地商家'], ['edu', 'Education', '教育'], ['trades', 'Trades', '施工'], ['media', 'Media', '媒体']];
+  var current = 'all';
+  function renderCases() {
+    var f = document.getElementById('filters');
+    f.innerHTML = FILTERS.map(function (x) { return '<button type="button" data-f="' + x[0] + '" aria-pressed="' + (x[0] === current) + '">' + T(x[1], x[2]) + '</button>'; }).join('');
+    f.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { current = b.dataset.f; renderCases(); }); });
+    var g = document.getElementById('caseGrid');
+    g.innerHTML = CASES.filter(function (c) { return current === 'all' || c.ind[0] === current; }).map(function (c) {
+      return '<article class="case"><div class="case-top"><span class="ind">' + T(c.ind[1], c.ind[2]) + '</span><span class="nm">' + c.nm + '</span></div>' +
+        '<blockquote>' + T('&ldquo;' + c.q[0] + '&rdquo;', c.q[1]) + '</blockquote>' +
+        '<dl class="ba"><dt>' + T('Before', '之前') + '</dt><dd>' + T(c.before[0], c.before[1]) + '</dd>' +
+        '<dt>' + T('Shipped', '交付') + '</dt><dd>' + T(c.shipped[0], c.shipped[1]) + '</dd>' +
+        '<dt class="g">' + T('Guardrail', '防线') + '</dt><dd class="g">' + T(c.guard[0], c.guard[1]) + '</dd></dl>' +
+        '<div class="stack">' + c.stack.map(function (s) { return '<span>' + s + '</span>'; }).join('') + '</div>' +
+        '<a class="more" href="' + c.url + '">' + T('See the product', '看产品') + ' &#8599;</a></article>';
+    }).join('') + '<article class="case next"><span class="ind">' + T('Next case', '下一个案例') + '</span><blockquote>' + T('&ldquo;Could this work for us?&rdquo;', '“我们这行也能做吗？”') + '</blockquote><p style="margin:0;font-size:16px;color:var(--muted)">' + T('Clinics, accounting firms, distributors, nonprofits. Tell me the task that eats your week and I&rsquo;ll tell you honestly whether AI fits.', '诊所、会计所、经销商、公益组织都可以。告诉我最耗你时间的那件事，我会如实告诉你 AI 合不合适。') + '</p><a class="btn solid" href="#ready" style="align-self:flex-start;margin-top:auto">' + T('Start with the readiness check', '先做适配自测') + ' &rarr;</a></article>';
+  }
+
+  /* Readiness check */
+  var QS = [
+    ['Does your team repeat the same task every day?', '你的团队每天都在重复做同一件事吗？'],
+    ['Is the knowledge it needs written down (menu, price list, policies)?', '做这件事需要的信息有写下来吗（菜单、价目表、规章）？'],
+    ['Can a person review the AI&rsquo;s work before a customer sees it?', '在客户看到之前，能有人先审一遍 AI 的结果吗？'],
+    ['Would a mistake be embarrassing rather than dangerous?', '万一出错，后果是尴尬而不是危险？'],
+    ['Is there one person who will own it after launch?', '上线以后，有一个人愿意负责它吗？'],
+    ['Can you measure the problem today (missed calls, hours, wait time)?', '这个问题现在能量化吗（漏接电话、耗费工时、等待时间）？']
+  ];
+  var ans = {}; try { ans = JSON.parse(localStorage.getItem('gt-ready') || '{}') || {}; } catch (e) { ans = {}; }
+  function renderQs() {
+    var box = document.getElementById('qs');
+    box.innerHTML = QS.map(function (q, i) {
+      var v = ans[i];
+      return '<div class="q"><span>' + T(q[0], q[1]) + '</span><div class="yn" role="group" aria-label="' + T('Answer', '回答') + '">' +
+        '<button type="button" class="y" id="q' + i + 'y" data-i="' + i + '" data-v="1" aria-pressed="' + (v === 1) + '">' + T('Yes', '是') + '</button>' +
+        '<button type="button" class="n" id="q' + i + 'n" data-i="' + i + '" data-v="0" aria-pressed="' + (v === 0) + '">' + T('No', '否') + '</button></div></div>';
+    }).join('');
+    box.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { ans[b.dataset.i] = +b.dataset.v; try { localStorage.setItem('gt-ready', JSON.stringify(ans)); } catch (e) {} renderQs(); }); });
+    var answered = Object.keys(ans).length, score = 0; Object.keys(ans).forEach(function (k) { score += ans[k]; });
+    document.getElementById('meter').innerHTML = QS.map(function (_, i) { return '<i class="' + (i < score ? 'on' : '') + '"></i>'; }).join('');
+    var title, bodyTxt;
+    if (answered < QS.length) {
+      document.getElementById('rScore').textContent = T(answered + ' of 6 answered', '已回答 ' + answered + ' / 6');
+      title = T('Answer all six to see where I&rsquo;d start.', '回答完六个问题，看看我会从哪里入手。');
+      bodyTxt = T('There are no wrong answers. A &ldquo;no&rdquo; usually tells me more than a &ldquo;yes&rdquo;.', '没有标准答案。很多时候，一个“否”比“是”更能说明问题。');
+    } else {
+      document.getElementById('rScore').textContent = T('Score ' + score + ' / 6', '得分 ' + score + ' / 6');
+      if (score >= 5) { title = T('Ready for a pilot.', '可以直接做试点。'); bodyTxt = T('Pick the task you named in question one. With human review on, a narrow version can be in front of real users within a month.', '就从第一题里那件事做起。保留人工审核，一个月内就能让收窄版本上线给真实用户用。'); }
+      else if (score >= 3) { title = T('Start small and internal.', '先从内部的小事做起。'); bodyTxt = T('Begin where only your staff see the output, such as drafting replies or summarizing calls. Fill in the &ldquo;no&rdquo; answers before anything faces customers.', '先做只有员工看得到的环节，比如起草回复、整理通话记录。等把“否”的那几项补上，再面向客户。'); }
+      else { title = T('Write it down first.', '先把东西写下来。'); bodyTxt = T('AI needs your menu, prices and rules in writing, and an owner. That groundwork is a project on its own, and it pays off even without AI.', 'AI 需要把菜单、价格和规则写成文字，也需要一个负责人。这本身就是一个项目，就算不用 AI 也值得做。'); }
+    }
+    document.getElementById('rTitle').innerHTML = title; document.getElementById('rBody').innerHTML = bodyTxt;
+  }
+
+  /* Season shelf */
+  var EPS = [['2026-10-08', 'ep00.jpg', '11 platforms, one question', '11 个平台，一个问题'], ['2026-10-13', 'ep01.jpg', 'AI safe enough for a law firm', '让律所敢用的 AI'], ['2026-10-15', 'ep02.jpg', 'Does ChatGPT mention you?', 'ChatGPT 会推荐你吗？'], ['2026-10-20', 'ep03.jpg', 'AI answers the restaurant phone', '让 AI 接餐厅电话'], ['2026-10-22', 'ep04.jpg', 'A tutor, not a cheating machine', '是家教，不是作弊机'], ['2026-10-27', 'ep05.jpg', 'Edit one frame, not the video', '改一帧，不重做整条'], ['2026-10-29', 'ep06.jpg', 'The unglamorous 90%', '不光鲜的那 90%'], ['2026-11-04', 'ep07.jpg', '7 controls in every AI agent', '每个 AI 智能体的 7 道防线']];
+  function renderShelf() {
+    var now = new Date(), out = 0;
+    document.getElementById('shelf').innerHTML = EPS.map(function (e, i) {
+      var d = new Date(e[0] + 'T08:30:00-04:00'), live = d <= now; if (live) out++;
+      var ds = d.toLocaleDateString(body.dataset.l === 'zh' ? 'zh-CN' : 'en-US', { month: 'short', day: 'numeric' });
+      return '<a href="https://www.linkedin.com/in/jameswangusa/recent-activity/all/"><img src="' + e[1] + '" alt="' + T('Episode ', '第 ') + i + T('', ' 集') + ': ' + T(e[2], e[3]).replace(/"/g, '') + '" loading="lazy"><div class="cap">Ep.' + String(i).padStart(2, '0') + ' &middot; ' + (live ? T('out now', '已发布') : T('coming ', '即将发布 ') + ds) + '<br>' + T(e[2], e[3]) + '</div></a>';
+    }).join('');
+    document.getElementById('epCount').textContent = T(out + ' of 8 published', '已发布 ' + out + ' / 8');
+  }
+
+  function renderAll() { renderCases(); renderQs(); renderShelf(); }
+  renderAll();
+  document.querySelectorAll('.lang button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.set === body.dataset.l ? 'true' : 'false'); });
+  document.documentElement.lang = body.dataset.l === 'zh' ? 'zh-CN' : 'en';
+
+  /* Copy email */
+  document.getElementById('copyMail').addEventListener('click', function () {
+    var el = document.getElementById('mail'), b = this;
+    function ok() { b.innerHTML = T('Copied', '已复制'); setTimeout(function () { b.innerHTML = '<span lang="en">Copy</span><span lang="zh">复制</span>'; }, 1600); }
+    function sel() { var r = document.createRange(); r.selectNodeContents(el); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+    try { navigator.clipboard.writeText(el.textContent).then(ok, sel); } catch (e) { sel(); }
+  });
+
+  /* Trace highlight: the full log is visible at rest; a soft cursor walks through it. */
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lines = document.querySelectorAll('#trace li'), idx = 0;
+  if (!reduce) setInterval(function () { lines.forEach(function (l) { l.classList.remove('on'); }); lines[idx % lines.length].classList.add('on'); idx++; }, 1400);
+
+  /* Contour map */
+  var cv = document.getElementById('topo'), ctx = cv.getContext('2d');
+  function noise(x, y) { return Math.sin(x * 1.7 + Math.sin(y * 1.3)) * .5 + Math.sin(y * 2.1 + Math.cos(x * .9)) * .35 + Math.sin((x + y) * 3.1) * .15; }
+  function draw() {
+    var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = r.width * dpr; cv.height = r.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var cs = getComputedStyle(document.documentElement), line = cs.getPropertyValue('--line').trim(), teal = cs.getPropertyValue('--teal').trim();
+    ctx.clearRect(0, 0, r.width, r.height);
+    var step = 7, cols = Math.ceil(r.width / step) + 1, rows = Math.ceil(r.height / step) + 1, sx = 3 / r.width, sy = 2.2 / r.height;
+    for (var lvl = -0.9; lvl <= 0.9; lvl += 0.12) {
+      ctx.strokeStyle = Math.abs(lvl) < 0.07 ? teal : line; ctx.lineWidth = Math.abs(lvl) < 0.07 ? 1.2 : 1; ctx.beginPath();
+      for (var i = 0; i < cols; i++) for (var j = 0; j < rows; j++) {
+        var x = i * step, y = j * step, a = noise(x * sx, y * sy) - lvl, b = noise((x + step) * sx, y * sy) - lvl, c = noise(x * sx, (y + step) * sy) - lvl;
+        if (a * b < 0) { var t = a / (a - b); ctx.moveTo(x + t * step, y); ctx.lineTo(x + t * step + .8, y + .8); }
+        if (a * c < 0) { var u = a / (a - c); ctx.moveTo(x, y + u * step); ctx.lineTo(x + .8, y + u * step + .8); }
+      }
+      ctx.stroke();
+    }
+    var g = ctx.createLinearGradient(0, 0, r.width * .62, 0);
+    g.addColorStop(0, 'rgba(0,0,0,.9)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = g; ctx.fillRect(0, 0, r.width, r.height); ctx.globalCompositeOperation = 'source-over';
+  }
+  draw(); var to; window.addEventListener('resize', function () { clearTimeout(to); to = setTimeout(draw, 150); });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+  new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+})();
+</script>
+</body>
+</html>
